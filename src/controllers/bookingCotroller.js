@@ -44,7 +44,7 @@ const getBooking = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     status: "success",
-    data: { booking },
+    data: booking,
   });
 });
 
@@ -71,7 +71,7 @@ const updateBooking = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     status: "success",
-    data: { booking },
+    data: booking,
   });
 });
 
@@ -89,10 +89,55 @@ const deleteBooking = asyncHandler(async (req, res) => {
   });
 });
 
+const getBookingsByDate = asyncHandler(async (req, res) => {
+  try {
+    const { date } = req.body;
+    console.log(date);
+
+    if (!date) {
+      return res.status(400).json({
+        status: "Failed",
+        message: "Please provide a date (YYYY-MM-DD)",
+      });
+    }
+
+    const targetDate = new Date(date);
+    if (isNaN(targetDate.getTime())) {
+      return res.status(400).json({
+        status: "Failed",
+        message: "Invalid date format. Use YYYY-MM-DD.",
+      });
+    }
+
+    // Get start & end of that day (for all bookings on that date)
+    const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
+
+    const bookings = await Booking.find({
+      dateOfBooking: { $gte: startOfDay, $lte: endOfDay },
+    })
+      .populate("patient", "name phone") // optional
+      .sort({ dateOfBooking: 1 });
+
+    res.status(200).json({
+      status: "Success",
+      count: bookings.length,
+      data: bookings,
+    });
+  } catch (error) {
+    console.error("Error fetching bookings by date:", error);
+    res.status(500).json({
+      status: "Failed",
+      message: "Server error while fetching bookings",
+    });
+  }
+});
+
 export default {
   createBooking,
   getAllBookings,
   getBooking,
   updateBooking,
   deleteBooking,
+  getBookingsByDate,
 };

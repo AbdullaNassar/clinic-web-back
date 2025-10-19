@@ -1,6 +1,5 @@
 import express from "express";
 
-// Import the default export (the object containing all the controller methods)
 import bookingController from "../../controllers/bookingCotroller.js";
 
 const router = express.Router();
@@ -12,6 +11,7 @@ const {
   getBooking,
   updateBooking,
   deleteBooking,
+  getBookingsByDate,
 } = bookingController;
 
 // ------------------------------------------------------------------
@@ -20,6 +20,8 @@ const {
 
 // GET all bookings
 router.get("/", getAllBookings);
+
+router.post("/by-date", getBookingsByDate);
 
 // POST create a new booking
 router.post("/", createBooking);
