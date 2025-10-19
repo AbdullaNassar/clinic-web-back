@@ -14,16 +14,21 @@ const bookingCreationSchema = Joi.object({
   // Required fields:
   bookingName: Joi.string().min(3).required(),
 
-  phoneNumbers: Joi.array().items(Joi.string()).min(1).max(3).required(),
-
+  phoneNumbers: Joi.array()
+    .items(Joi.string().trim().min(5))
+    .min(1)
+    .max(3)
+    .required()
+    .messages({
+      "array.min": "At least one phone number is required",
+    }),
   dateOfBooking: Joi.date().required(),
 
   typeOfBooking: Joi.string()
     .valid(...typeOfBookingEnum) // <-- Use constant
     .required(),
 
-  patient: Joi.string().required(), // Optional fields:
-
+  patient: Joi.string().allow(null).optional(),
   sourceOfBooking: Joi.string()
     .valid(...sourceOfBookingEnum) // <-- Use constant
     .optional(),
@@ -42,16 +47,21 @@ const bookingCreationSchema = Joi.object({
 const bookingUpdateSchema = Joi.object({
   bookingName: Joi.string().min(3).optional(),
 
-  phoneNumbers: Joi.array().items(Joi.string()).min(1).max(3).optional(),
-
+  phoneNumbers: Joi.array()
+    .items(Joi.string().trim().min(5))
+    .min(1)
+    .max(3)
+    .required()
+    .messages({
+      "array.min": "At least one phone number is required",
+    }),
   dateOfBooking: Joi.date().optional(),
 
   typeOfBooking: Joi.string()
     .valid(...typeOfBookingEnum) // <-- Use constant
     .optional(),
 
-  patient: Joi.string().optional(),
-
+  patient: Joi.string().allow(null).optional(),
   sourceOfBooking: Joi.string()
     .valid(...sourceOfBookingEnum) // <-- Use constant
     .optional(),
@@ -95,7 +105,7 @@ const bookingSchema = new mongoose.Schema(
     patient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Patient",
-      required: true,
+      required: false,
     },
   },
   { timestamps: true }

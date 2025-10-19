@@ -44,7 +44,7 @@ const getAllPatients = asyncHandler(async (req, res) => {
   res.status(200).json({
     status: "success",
     results: patients.length,
-    data: { patients },
+    data: patients,
   });
 });
 
@@ -64,7 +64,7 @@ const getPatient = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     status: "success",
-    data: { patient },
+    data: patient,
   });
 });
 

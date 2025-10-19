@@ -20,7 +20,7 @@ const createBooking = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     status: "success",
-    data: { booking: newBooking },
+    data: newBooking,
   });
 });
 
@@ -30,7 +30,7 @@ const getAllBookings = asyncHandler(async (req, res) => {
   res.status(200).json({
     status: "success",
     results: bookings.length,
-    data: { bookings },
+    data: bookings,
   });
 });
 
