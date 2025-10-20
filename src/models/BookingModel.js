@@ -1,17 +1,18 @@
 import mongoose from "mongoose";
 import Joi from "joi";
-// Import the constants/enums from the new file
 import {
   typeOfBookingEnum,
   sourceOfBookingEnum,
   whereOfBookingEnum,
 } from "../utils/constants/enums.js";
 
+// Define status enum
+const statusEnum = ["pending", "completed", "cancelled"];
+
 // ------------------------------------
 // 1. Joi Schema for CREATION
 // ------------------------------------
 const bookingCreationSchema = Joi.object({
-  // Required fields:
   bookingName: Joi.string().min(3).required(),
 
   phoneNumbers: Joi.array()
@@ -22,23 +23,31 @@ const bookingCreationSchema = Joi.object({
     .messages({
       "array.min": "At least one phone number is required",
     }),
+
   dateOfBooking: Joi.date().required(),
 
   typeOfBooking: Joi.string()
-    .valid(...typeOfBookingEnum) // <-- Use constant
+    .valid(...typeOfBookingEnum)
     .required(),
 
   patient: Joi.string().allow(null).optional(),
+
   sourceOfBooking: Joi.string()
-    .valid(...sourceOfBookingEnum) // <-- Use constant
+    .valid(...sourceOfBookingEnum)
     .optional(),
 
   whereOfBooking: Joi.string()
-    .valid(...whereOfBookingEnum) // <-- Use constant
+    .valid(...whereOfBookingEnum)
     .default("inclinic")
     .optional(),
 
   isConfirmed: Joi.boolean().default(false).optional(),
+
+  // ✅ Add status validation
+  status: Joi.string()
+    .valid(...statusEnum)
+    .default("pending")
+    .optional(),
 });
 
 // ------------------------------------
@@ -55,22 +64,29 @@ const bookingUpdateSchema = Joi.object({
     .messages({
       "array.min": "At least one phone number is required",
     }),
+
   dateOfBooking: Joi.date().optional(),
 
   typeOfBooking: Joi.string()
-    .valid(...typeOfBookingEnum) // <-- Use constant
+    .valid(...typeOfBookingEnum)
     .optional(),
 
   patient: Joi.string().allow(null).optional(),
+
   sourceOfBooking: Joi.string()
-    .valid(...sourceOfBookingEnum) // <-- Use constant
+    .valid(...sourceOfBookingEnum)
     .optional(),
 
   whereOfBooking: Joi.string()
-    .valid(...whereOfBookingEnum) // <-- Use constant
+    .valid(...whereOfBookingEnum)
     .optional(),
 
   isConfirmed: Joi.boolean().optional(),
+
+  // ✅ Allow status update
+  status: Joi.string()
+    .valid(...statusEnum)
+    .optional(),
 }).unknown(true);
 
 // ------------------------------------
@@ -79,6 +95,7 @@ const bookingUpdateSchema = Joi.object({
 const bookingSchema = new mongoose.Schema(
   {
     bookingName: { type: String, required: true, minlength: 3, trim: true },
+
     phoneNumbers: {
       type: [String],
       validate: {
@@ -86,26 +103,39 @@ const bookingSchema = new mongoose.Schema(
         message: "Phone numbers must be an array of 1 to 3 numbers.",
       },
     },
+
     sourceOfBooking: {
       type: String,
-      enum: sourceOfBookingEnum, // <-- Use constant
+      enum: sourceOfBookingEnum,
     },
+
     dateOfBooking: { type: Date, required: true },
+
     typeOfBooking: {
       type: String,
-      enum: typeOfBookingEnum, // <-- Use constant
+      enum: typeOfBookingEnum,
       required: true,
     },
+
     whereOfBooking: {
       type: String,
-      enum: whereOfBookingEnum, // <-- Use constant
+      enum: whereOfBookingEnum,
       default: "inclinic",
     },
+
     isConfirmed: { type: Boolean, default: false },
+
     patient: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Patient",
       required: false,
+    },
+
+    // ✅ Add status to Mongoose schema
+    status: {
+      type: String,
+      enum: statusEnum,
+      default: "pending",
     },
   },
   { timestamps: true }
@@ -117,4 +147,4 @@ const bookingSchema = new mongoose.Schema(
 const Booking = mongoose.model("Booking", bookingSchema);
 
 export default Booking;
-export { bookingCreationSchema, bookingUpdateSchema };
+export { bookingCreationSchema, bookingUpdateSchema, statusEnum };

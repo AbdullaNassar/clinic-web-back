@@ -50,3 +50,16 @@ export const sourceOfBookingEnum = [
   "Other",
 ];
 export const whereOfBookingEnum = ["inclinic", "online"];
+
+export const surgeryTypeEnum = ["Spine Surgery", "Non-Spine Surgery"];
+export const spinePlaceEnum = [
+  "Cervical (Neck)",
+  "Thoracic (Mid-Back)",
+  "Lumbar (Lower Back)",
+  "Sacral/Coccyx",
+  "Other",
+];
+export const painPlaceEnum = ["Right", "Left", "Both", "None"];
+export const getBetterEnum = ["Yes", "No", "Maybe"];
+export const surgeonEnum = ["Me", "Other"];
+export const countryEnum = ["Egypt", "Abroad"];

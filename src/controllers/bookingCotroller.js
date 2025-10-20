@@ -91,8 +91,8 @@ const deleteBooking = asyncHandler(async (req, res) => {
 
 const getBookingsByDate = asyncHandler(async (req, res) => {
   try {
-    const { date } = req.body;
-    console.log(date);
+    const { date, isConfirmed } = req.body;
+    console.log(date, isConfirmed);
 
     if (!date) {
       return res.status(400).json({
@@ -109,14 +109,21 @@ const getBookingsByDate = asyncHandler(async (req, res) => {
       });
     }
 
-    // Get start & end of that day (for all bookings on that date)
+    // Get start & end of that day
     const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
     const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
 
-    const bookings = await Booking.find({
+    // Build filter dynamically
+    const filter = {
       dateOfBooking: { $gte: startOfDay, $lte: endOfDay },
-    })
-      .populate("patient", "name phone") // optional
+    };
+
+    if (typeof isConfirmed !== "undefined") {
+      filter.isConfirmed = isConfirmed;
+    }
+
+    const bookings = await Booking.find(filter)
+      .populate("patient", "name phone")
       .sort({ dateOfBooking: 1 });
 
     res.status(200).json({

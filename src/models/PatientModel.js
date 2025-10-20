@@ -1,50 +1,16 @@
 import mongoose from "mongoose";
 import Joi from "joi";
-
-// ... (All Joi Enums and Sub-Schemas definitions remain unchanged) ...
-
-// Title Job Enum
-const titleJobEnum = ["doctor", "engineer", "student"];
-const genderEnum = ["male", "female"];
-const materialStatusEnum = ["single", "married", "divorced", "widow"];
-const menstrualStatusEnum = ["regular", "nonRegular"];
-const statureEnum = [
-  "Dwarf stature (--)",
-  "Short stature (-)",
-  "Average stature",
-  "Tall stature (+)",
-  "Giant stature (++)",
-];
-const bodyWeightEnum = [
-  "Skinny Thin (--)",
-  "Under weight (-)",
-  "Average weight",
-  "Over weight (+)",
-  "Obese / Fat (++)",
-  "Morbid Obesity (+++)",
-];
-const bodyBuildEnum = [
-  "Meager body build (--)",
-  "Weak body build (-)",
-  "Average body build",
-  "Firm body build (+)",
-  "Athlete body build (++)",
-];
-const generalHealthEnum = [
-  "Cachectic health (--)",
-  "Sick health (-)",
-  "Average health",
-  "Vital & Active health (+)",
-];
-const physiologicalStatusChoices = [
-  "Arrogant",
-  "Bipolar Manic",
-  "Confident",
-  "Depressed",
-  "Diffident",
-  "Hesitant",
-  "Obsessed (OCD)",
-];
+import {
+  bodyBuildEnum,
+  bodyWeightEnum,
+  genderEnum,
+  generalHealthEnum,
+  materialStatusEnum,
+  menstrualStatusEnum,
+  physiologicalStatusChoices,
+  statureEnum,
+  titleJobEnum,
+} from "../utils/constants/enums.js";
 
 const addressSchemaJoi = Joi.object({
   primary: Joi.object()
@@ -133,6 +99,10 @@ const patientCreationSchema = Joi.object({
   physiologicalStatus: Joi.array()
     .items(Joi.string().valid(...physiologicalStatusChoices))
     .optional(),
+  avatar: Joi.string()
+    .uri()
+    .optional()
+    .default("https://res.cloudinary.com/deuxt0stn/image/upload/v1760994428/profile_b5qd9c.png"),
 });
 
 // ------------------------------------
@@ -179,6 +149,10 @@ const patientUpdateSchema = Joi.object({
   physiologicalStatus: Joi.array()
     .items(Joi.string().valid(...physiologicalStatusChoices))
     .optional(),
+  avatar: Joi.string()
+    .uri()
+    .optional()
+    .default("https://res.cloudinary.com/deuxt0stn/image/upload/v1760994428/profile_b5qd9c.png"),
 }).unknown(true); // Allow unknown fields for robust partial updates
 
 // ------------------------------------
@@ -186,7 +160,7 @@ const patientUpdateSchema = Joi.object({
 // ------------------------------------
 const patientSchema = new mongoose.Schema(
   {
-    // ... (Mongoose schema definition is unchanged)
+    // ...existing code...
     fullName: { type: String, required: true, minlength: 10, trim: true },
     titleJob: { type: String, enum: titleJobEnum },
     dateOfBirth: { type: Date },
@@ -224,6 +198,11 @@ const patientSchema = new mongoose.Schema(
     bodyBuild: { type: String, enum: bodyBuildEnum },
     generalHealth: { type: String, enum: generalHealthEnum },
     physiologicalStatus: { type: [String], enum: physiologicalStatusChoices },
+    avatar: {
+      type: String,
+      default: "https://res.cloudinary.com/deuxt0stn/image/upload/v1760994428/profile_b5qd9c.png",
+      trim: true,
+    },
   },
   {
     timestamps: true,
